@@ -425,8 +425,6 @@ Username: $UserName
 Full Name: $FullName
 Email: $Email
 GeoLocation: $GeoLocation
-Latitude:  $Lat 
-Longitude: $Lon
 
 ------------------------------------------------------------------------------------------------------------------------------
 
