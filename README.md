@@ -33,9 +33,9 @@ This PowerShell script is designed to gather system information and perform vari
 
 1. **User Information:** Gathers details like username, full name, email, and geolocation.
 
-2. **System Information:** Retrieves data on UAC and RDP state, LSASS status, and computer components.
+2. **System Information:** Retrieves data on UAC and RDP state, LSASS status, and Gathers information about the computer, BIOS, operating system, CPU, mainboard, RAM, and video card
 
-3. **Network Information:** Provides public IP, local IP with MAC address, and network interface details.
+3. **Network Information:** Provides public IP, local IP with MAC address, WiFi profiles, and nearby WiFi networks
 
 4. **Startup Contents:** Lists items in the startup folder for potential persistence mechanisms.
 
@@ -43,11 +43,11 @@ This PowerShell script is designed to gather system information and perform vari
 
 6. **Logon Sessions:** Shows active logon sessions.
 
-7. **Recent Files:** Lists recently accessed files.
+7. **Recent Files:** Retrieves the 50 most recent files in the user's profile
 
 8. **HDD Information:** Retrieves details about connected hard drives.
 
-9. **Processes:** Displays information about running processes.
+9. **Processes:** Displays information about running processes, listeners, services, software, drivers, and video cards
 
 10. **Browser Data:** Gathers history and bookmarks from Google Chrome, Microsoft Edge, and Mozilla Firefox.
 
@@ -86,4 +86,5 @@ powershell.exe path/to/file/Badusb.ps1
 If you find my work helpful or enjoyable, consider supporting me with a cup of coffee! ☕
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%E2%98%95-yellow)](https://www.buymeacoffee.com/d10xi24)
-# Badboy
+
+
