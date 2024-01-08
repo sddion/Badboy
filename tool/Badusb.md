@@ -6,7 +6,6 @@ Author Name: Dion
 Email: d10xi24@proton.me
 GitHub: [https://github.com/d10xi24]
 
-GitHub Profile: [https://github.com/d10xi24]
 
 ####################################################################################################
 # Tool Information:
@@ -36,6 +35,6 @@ GitHub Repository:
 [https://github.com/d10xi24/Badboy]
 
 Contact Information:
-For feedback, inquiries, or collaboration, please reach out to Dion via email at dion@d10xi24.com.
+For feedback, inquiries, or collaboration, please reach out to Dion via email at d10xi24@proton.me.
 
 ####################################################################################################
