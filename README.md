@@ -63,7 +63,7 @@ This PowerShell script is designed to gather system information and perform vari
 
 1. Insert the USB drive
 2. The script creates a loot folder, gathers information, and generates a zip file.
-3. The zip file is moved to a specified destination (replace 'F:\' with your pendrive's drive letter).
+3. The zip file is moved to a specified destination (replace 'F:\' with your pendrive's drive letter (line 570)).
 4. Autorun triggers the script execution
 5. System information is gathered
 6. Autorun deletes the temporary files on the local system and Data is saved in the USB drive
@@ -74,17 +74,16 @@ This PowerShell script is designed to gather system information and perform vari
 To run the script manually, use the following command:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File Badusb.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File (F:/path/to/file/)Badusb.ps1
 ```
 
 or just 
 
 ```powershell
-powershell.exe path/to/file/Badusb.ps1
+powershell.exe (F:/path/to/file/)Badusb.ps1 
 ```
 
 If you find my work helpful or enjoyable, consider supporting me with a cup of coffee! ☕
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%E2%98%95-yellow)](https://www.buymeacoffee.com/d10xi24)
-
 
