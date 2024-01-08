@@ -95,6 +95,6 @@ If you find my work helpful or enjoyable, consider supporting me with a cup of c
 
 ### IMPORTANT NOTES :
 
-1. Zip File and SQL URL Update: Before using the script, ensure to update the zip file name and the SQLite URL with the latest information from https://sqlite.org/index.html.This guarantees that you're using the most up-to-date resources
+1. Zip File and SQL URL Update: Before using the script, ensure to update the zip file name and the SQLite URL with the latest information from https://sqlite.org/index.html. This guarantees that you're using the most up-to-date resources
 
 2. The loot file is moved to a specified destination (replace 'F:\' with your pendrive's drive letter (line 570)).
