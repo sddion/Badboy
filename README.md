@@ -1,5 +1,9 @@
 # Bad USB - Reconnaissance PowerShell Script
-
+<p align="left">
+  <img src="https://img.shields.io/badge/Author-dion@d10xi24-blue?style=flat-square">
+  <img src="https://img.shields.io/badge/Maintained%3F-Yes-green?style=flat-square">
+  <img src="https://img.shields.io/badge/Written%20In-Puwershell-yellow?style=flat-square">
+</p>
 
 <div align="center">
   <img height="150" src="https://media1.giphy.com/media/eq0QfBoBObV4WFg1lK/giphy.gif?cid=ecf05e47ab6v296ro5brtrcjf8a9pur7vn9nyex6ld52tyo5&ep=v1_gifs_search&rid=giphy.gif&ct=g" />
